@@ -4,16 +4,7 @@ import {BaseLayout, NFTList, useWeb3} from '../components';
 import nfts from '../content/meta.json';
 const Home: NextPage = () => {
 	const {ethereum, isLoading, contract, provider} = useWeb3();
-	const getAccounts = async () => {
-		const accounts = await provider!.listAccounts();
-		if (!accounts.length) {
-			ethereum!.request({method: 'eth_requestAccounts'});
-		}
-		console.log('📢[index.tsx:10]: ', accounts[0]);
-	};
-	if (provider) {
-		getAccounts();
-	}
+
 	return (
 		<BaseLayout>
 			<div className='relative px-4 pt-16 pb-20 bg-gray-50 sm:px-6 lg:pt-24 lg:pb-28 lg:px-8'>

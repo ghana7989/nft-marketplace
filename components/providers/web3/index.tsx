@@ -1,4 +1,5 @@
 import {setupHooks} from '@hooks/web3/setupHooks';
+import {MetaMaskInpageProvider} from '@metamask/providers';
 import {ethers} from 'ethers';
 import {createContext, FC, useContext, useEffect, useState} from 'react';
 import {
@@ -14,6 +15,21 @@ interface IWeb3ProviderProps {
 	children: React.ReactNode;
 }
 
+const pageReload = () => window.location.reload();
+const handleAccount = (ethereum: MetaMaskInpageProvider) => async () => {
+	const isLocked = !(await ethereum._metamask.isUnlocked());
+	if (isLocked) {
+		pageReload();
+	}
+};
+const setGlobalListeners = (ethereum: MetaMaskInpageProvider) => {
+	ethereum.on('chainChanged', pageReload);
+	ethereum.on('accountsChanged', handleAccount(ethereum));
+};
+const removeGlobalListeners = (ethereum: MetaMaskInpageProvider) => {
+	ethereum?.removeListener('chainChanged', pageReload);
+	ethereum?.removeListener('accountsChanged', handleAccount);
+};
 export const Web3Provider: FC<IWeb3ProviderProps> = ({children}) => {
 	const [web3Api, setWeb3Api] = useState<Web3State>(createDefaultState());
 
@@ -23,6 +39,7 @@ export const Web3Provider: FC<IWeb3ProviderProps> = ({children}) => {
 				const {ethereum} = window;
 				const provider = new ethers.providers.Web3Provider(ethereum as any);
 				const contract = await loadContract('NftMarket', provider);
+				setGlobalListeners(ethereum);
 				if (ethereum) {
 					setWeb3Api(
 						createWeb3State({
@@ -36,7 +53,6 @@ export const Web3Provider: FC<IWeb3ProviderProps> = ({children}) => {
 					alert('Please install MetaMask');
 				}
 			} catch (error) {
-				console.error(error);
 				setWeb3Api(() => {
 					return {
 						...createDefaultState(),
@@ -46,7 +62,11 @@ export const Web3Provider: FC<IWeb3ProviderProps> = ({children}) => {
 			}
 		}
 		initWeb3();
+		return () => {
+			removeGlobalListeners(window.ethereum);
+		};
 	}, []);
+
 	return (
 		<Web3Context.Provider value={web3Api}>{children}</Web3Context.Provider>
 	);

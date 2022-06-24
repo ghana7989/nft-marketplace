@@ -20,6 +20,10 @@ export const hookFactory: AccountHookFactory =
 				if (!accounts || !accounts.length) throw 'Connect to web3 wallet';
 				return accounts[0];
 			},
+			{
+				revalidateOnFocus: false,
+				shouldRetryOnError: false,
+			},
 		);
 
 		const handleAccountsChanged = (...args: unknown[]) => {
@@ -28,6 +32,7 @@ export const hookFactory: AccountHookFactory =
 				return console.error(`Please connect to web3 wallet`);
 			else if (accounts[0] !== data) {
 				mutate(accounts[0]);
+				window.location.reload();
 			}
 		};
 
@@ -49,7 +54,7 @@ export const hookFactory: AccountHookFactory =
 			mutate,
 			connect,
 			isValidating,
-			isLoading: isLoading || isValidating,
+			isLoading: isLoading as boolean,
 			isInstalled: ethereum?.isMetaMask || false,
 			...rest,
 		};

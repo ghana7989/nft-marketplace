@@ -1,14 +1,17 @@
-import {useAccount} from '@hooks';
+import {useAccount, useNetwork} from '@hooks';
 import Link from 'next/link';
 import {useState} from 'react';
+import {WalletBar} from './WalletBar';
 
 export function Navbar() {
 	const {
 		account: {data, connect, isInstalled, isLoading},
 	} = useAccount();
+	const {network} = useNetwork();
+	console.log('📢[index.tsx:10]: ', network.data);
+
 	return (
 		<div className='self-center navbar bg-base-100 max-w-7xl'>
-			{data}
 			<div className='navbar-start'>
 				<div className='dropdown'>
 					<label tabIndex={0} className='btn btn-ghost lg:hidden'>
@@ -63,35 +66,27 @@ export function Navbar() {
 				</ul>
 			</div>
 			<div className='navbar-end'>
-				{!isLoading ? (
-					<div className='dropdown dropdown-end'>
-						<label tabIndex={0} className='btn btn-ghost btn-circle avatar'>
-							<div className='w-10 rounded-full'>
-								<img src='https://api.lorem.space/image/face?hash=33791' />
-							</div>
-						</label>
-						<ul
-							tabIndex={0}
-							className='p-2 mt-3 shadow menu menu-compact dropdown-content bg-base-100 rounded-box w-52'>
-							<li>
-								<Link href='/profile'>
-									<a className='justify-between'>
-										Profile
-										<span className='badge'>New</span>
-									</a>
-								</Link>
-							</li>
-
-							<li>
-								<a>Logout</a>
-							</li>
-						</ul>
-					</div>
-				) : (
-					<button className='text-white btn btn-info' onClick={connect}>
-						Connect Wallet
-					</button>
-				)}
+				<div className='self-center mr-2 text-gray-300'>
+					<span className='inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-purple-100 text-purple-800'>
+						<svg
+							className='-ml-0.5 mr-1.5 h-2 w-2 text-indigo-400'
+							fill='currentColor'
+							viewBox='0 0 8 8'>
+							<circle cx={4} cy={4} r={3} />
+						</svg>
+						{isInstalled
+							? network.data
+							: network.isLoading
+							? 'Loading...'
+							: 'Install Web3 Wallet'}
+					</span>
+				</div>
+				<WalletBar
+					connect={connect}
+					isInstalled={isInstalled}
+					account={data}
+					isLoading={isLoading}
+				/>
 			</div>
 		</div>
 	);

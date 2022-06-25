@@ -1,86 +1,151 @@
-const {assert} = require('console');
-
 const NftMarket = artifacts.require('NftMarket');
-const ethers = require('ethers');
+const {ethers} = require('ethers');
+
 contract('NftMarket', accounts => {
 	let _contract = null;
-	let _ntfPrice = ethers.utils.parseEther('0.1').toString();
+	let _nftPrice = ethers.utils.parseEther('0.3').toString();
 	let _listingPrice = ethers.utils.parseEther('0.025').toString();
 
 	before(async () => {
 		_contract = await NftMarket.deployed();
 	});
+
+	// return;
 	describe('Mint token', () => {
 		const tokenURI = 'https://test.com';
 		before(async () => {
-			await _contract.mintToken(tokenURI, _ntfPrice, {
+			await _contract.mintToken(tokenURI, _nftPrice, {
 				from: accounts[0],
 				value: _listingPrice,
 			});
 		});
+
 		it('owner of the first token should be address[0]', async () => {
 			const owner = await _contract.ownerOf(1);
-			assert(owner == accounts[0], 'owner should be accounts[0]');
-		});
-		it('first token should point to the correct tokenURI', async () => {
-			const actualTokenURI = await _contract.tokenURI(1);
-			assert(
-				actualTokenURI == tokenURI,
-				'tokenURI in the contract is NOT same tokenURI provided for the test',
+			assert.equal(
+				owner,
+				accounts[0],
+				'Owner of token is not matching address[0]',
 			);
 		});
-		it('should NOT be possible to create NFT with used tokenURI', async () => {
+
+		it('first token should point to the correct tokenURI', async () => {
+			const actualTokenURI = await _contract.tokenURI(1);
+
+			assert.equal(actualTokenURI, tokenURI, 'tokenURI is not correctly set');
+		});
+
+		it('should not be possible to create a NFT with used tokenURI', async () => {
 			try {
-				await _contract.mintToken(tokenURI, _ntfPrice, {
+				await _contract.mintToken(tokenURI, _nftPrice, {
 					from: accounts[0],
 				});
 			} catch (error) {
-				assert(error, 'NFT was minted with used tokenURI');
+				assert(error, 'NFT was minted with previously used tokenURI');
 			}
 		});
+
 		it('should have one listed item', async () => {
-			const count = await _contract.listedItemsCount();
-			assert(
-				count.toNumber() === 1,
-				'listed Items count should be one because we are minting one token in before block',
+			const listedItemCount = await _contract.listedItemsCount();
+			assert.equal(
+				listedItemCount.toNumber(),
+				1,
+				'Listed items count is not 1',
 			);
 		});
-		it('should have created NFT item', async () => {
+
+		it('should have create NFT item', async () => {
 			const nftItem = await _contract.getNftItem(1);
-			assert(nftItem.tokenId === '1', 'tokenId should be 1');
-			assert(nftItem.price === _ntfPrice, 'Nft price is incorrect');
-			assert(
-				nftItem.creator === accounts[0],
-				'creator is not the first account in accounts array (accounts[0])',
-			);
-			assert(
-				nftItem.isListed === true,
-				'Initial NFT should be listed unless it is deListed',
-			);
+
+			assert.equal(nftItem.tokenId, 1, 'Token id is not 1');
+			assert.equal(nftItem.price, _nftPrice, 'Nft price is not correct');
+			assert.equal(nftItem.creator, accounts[0], 'Creator is not account[0]');
+			assert.equal(nftItem.isListed, true, 'Token is not listed');
 		});
 	});
 
-	describe('Buy NFT', async () => {
+	describe('Buy NFT', () => {
 		before(async () => {
 			await _contract.buyNft(1, {
 				from: accounts[1],
-				value: _ntfPrice,
+				value: _nftPrice,
 			});
 		});
-		it('should be un-listed after buying', async () => {
+
+		it('should unlist the item', async () => {
 			const listedItem = await _contract.getNftItem(1);
-			assert(listedItem.isListed === false, 'NFT should be unlisted');
+			assert.equal(listedItem.isListed, false, 'Item is still listed');
 		});
-		it('should decrease the total items count', async () => {
-			const count = await _contract.listedItemsCount();
-			assert(
-				count.toNumber() === 0,
-				'total items count should be 0 this mean the decrement is not working ',
+
+		it('should decrease listed items count', async () => {
+			const listedItemsCount = await _contract.listedItemsCount();
+			assert.equal(
+				listedItemsCount.toNumber(),
+				0,
+				'Count has not been decrement',
 			);
 		});
+
 		it('should change the owner', async () => {
 			const currentOwner = await _contract.ownerOf(1);
-			assert(currentOwner === accounts[1], 'owner should be accounts[1]');
+			assert.equal(currentOwner, accounts[1], 'Item is still listed');
+		});
+	});
+
+	describe('Token transfers', () => {
+		const tokenURI = 'https://test-json-2.com';
+		before(async () => {
+			await _contract.mintToken(tokenURI, _nftPrice, {
+				from: accounts[0],
+				value: _listingPrice,
+			});
+		});
+
+		it('should have two NFTs created', async () => {
+			const totalSupply = await _contract.totalSupply();
+			assert.equal(
+				totalSupply.toNumber(),
+				2,
+				'Total supply of token is not correct',
+			);
+		});
+
+		it('should be able to retreive nft by index', async () => {
+			const nftId1 = await _contract.tokenByIndex(0);
+			const nftId2 = await _contract.tokenByIndex(1);
+
+			assert.equal(nftId1.toNumber(), 1, 'Nft id is wrong');
+			assert.equal(nftId2.toNumber(), 2, 'Nft id is wrong');
+		});
+
+		it('should have one listed NFT', async () => {
+			const allNfts = await _contract.getAllNftsOnSale();
+			assert.equal(allNfts[0].tokenId, 2, 'Nft has a wrong id');
+		});
+
+		it('account[1] should have one owned NFT', async () => {
+			const ownedNfts = await _contract.getOwnedNfts({from: accounts[1]});
+			assert.equal(ownedNfts[0].tokenId, 1, 'Nft has a wrong id');
+		});
+
+		it('account[0] should have one owned NFT', async () => {
+			const ownedNfts = await _contract.getOwnedNfts({from: accounts[0]});
+			assert.equal(ownedNfts[0].tokenId, 2, 'Nft has a wrong id');
+		});
+	});
+	describe('Token transfer to new owner', () => {
+		before(async () => {
+			await _contract.transferFrom(accounts[0], accounts[1], 2);
+		});
+
+		it('accounts[0] should own 0 tokens', async () => {
+			const ownedNfts = await _contract.getOwnedNfts({from: accounts[0]});
+			assert.equal(ownedNfts.length, 0, 'Invalid length of tokens');
+		});
+
+		it('accounts[1] should own 2 tokens', async () => {
+			const ownedNfts = await _contract.getOwnedNfts({from: accounts[1]});
+			assert.equal(ownedNfts.length, 2, 'Invalid length of tokens');
 		});
 	});
 });

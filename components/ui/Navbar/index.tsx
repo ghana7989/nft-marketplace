@@ -8,7 +8,6 @@ export function Navbar() {
 		account: {data, connect, isInstalled, isLoading},
 	} = useAccount();
 	const {network} = useNetwork();
-	console.log('📢[index.tsx:10]: ', network.data);
 
 	return (
 		<div className='self-center navbar bg-base-100 max-w-7xl'>

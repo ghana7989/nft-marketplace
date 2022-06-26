@@ -1,5 +1,6 @@
 import {setupHooks} from '@hooks/web3/setupHooks';
 import {MetaMaskInpageProvider} from '@metamask/providers';
+import {NftMarketContract} from '@_types/nftMarketContract';
 import {ethers} from 'ethers';
 import {createContext, FC, useContext, useEffect, useState} from 'react';
 import {
@@ -39,6 +40,8 @@ export const Web3Provider: FC<IWeb3ProviderProps> = ({children}) => {
 				const {ethereum} = window;
 				const provider = new ethers.providers.Web3Provider(ethereum as any);
 				const contract = await loadContract('NftMarket', provider);
+				const signer = provider.getSigner();
+				const signedContract = contract.connect(signer);
 				setGlobalListeners(ethereum);
 				if (ethereum) {
 					setWeb3Api(
@@ -46,7 +49,7 @@ export const Web3Provider: FC<IWeb3ProviderProps> = ({children}) => {
 							isLoading: false,
 							ethereum,
 							provider,
-							contract,
+							contract: signedContract as unknown as NftMarketContract,
 						}),
 					);
 				} else {

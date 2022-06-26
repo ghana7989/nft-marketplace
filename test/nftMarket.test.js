@@ -148,4 +148,35 @@ contract('NftMarket', accounts => {
 			assert.equal(ownedNfts.length, 2, 'Invalid length of tokens');
 		});
 	});
+	describe('Listing an NFT', async () => {
+		before(async () => {
+			await _contract.placeNftOnSale(1, _nftPrice, {
+				from: accounts[1],
+				value: _listingPrice,
+			});
+		});
+		it('should have 2 listed items', async () => {
+			const allListedNfts = await _contract.getAllNftsOnSale();
+			assert.equal(allListedNfts.length, 2, 'Invalid length of tokens');
+		});
+		it('should be the owner of the contract for changing the listing price', async () => {
+			let _listingPrice = ethers.utils.parseEther('0.1').toString();
+			await _contract.setListingPrice(_listingPrice, {from: accounts[0]});
+			const listingPrice = await _contract.listingPrice();
+
+			assert.equal(listingPrice, _listingPrice, 'Listing price is not correct');
+		});
+		it('Will throw an error when someone else other than the owner tries to change the listing price', async () => {
+			let _listingPrice = ethers.utils.parseEther('1').toString();
+			try {
+				await _contract.setListingPrice(_listingPrice, {from: accounts[2]});
+			} catch {
+				const listingPrice = await _contract.listingPrice();
+				assert(
+					listingPrice !== _listingPrice,
+					'WARNING: Listing price can be modified by anyone please check the code',
+				);
+			}
+		});
+	});
 });

@@ -2,9 +2,9 @@ import {Nft} from '@_types/NFT';
 import {FC} from 'react';
 type NftItemProps = {
 	item: Nft;
+	buyNft: (tokenId: number, value: number) => Promise<void>;
 };
-export const NFTItem: FC<NftItemProps> = ({item}) => {
-	console.log('📢[index.tsx:6]: ', item);
+export const NFTItem: FC<NftItemProps> = ({item, buyNft}) => {
 	return (
 		<div key={item.meta.image}>
 			<div className='flex-shrink-0'>
@@ -28,6 +28,21 @@ export const NFTItem: FC<NftItemProps> = ({item}) => {
 				</div>
 				<div className='mb-4 overflow-hidden'>
 					<dl className='flex flex-wrap -mx-4 -mt-4'>
+						<div className='flex flex-col px-4 pt-4'>
+							<dt className='order-2 text-sm font-medium text-gray-500'>
+								Price
+							</dt>
+							<dd className='order-1 text-xl font-extrabold text-indigo-600'>
+								<div className='flex items-center justify-center'>
+									{item.price}
+									<img
+										className='h-6'
+										src='https://raw.githubusercontent.com/Jerga99/nft-marketplace/main/public/images/small-eth.webp'
+										alt='ether icon'
+									/>
+								</div>
+							</dd>
+						</div>
 						{item.meta.attributes?.map(attribute => (
 							<div
 								key={attribute.trait_type}
@@ -44,6 +59,9 @@ export const NFTItem: FC<NftItemProps> = ({item}) => {
 				</div>
 				<div>
 					<button
+						onClick={() =>
+							buyNft(parseInt(item.tokenId.toString()), item.price)
+						}
 						type='button'
 						className='inline-flex items-center px-4 py-2 mr-2 text-base font-medium text-white bg-indigo-600 border border-transparent rounded-md shadow-sm disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none disabled:cursor-not-allowed hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'>
 						Buy

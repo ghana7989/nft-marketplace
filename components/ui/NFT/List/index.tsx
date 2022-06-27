@@ -1,19 +1,22 @@
+import {useListedNfts} from '@hooks';
 import {Nft} from '@_types/NFT';
 import {FC} from 'react';
 import {NFTItem} from '../Item';
 
-type NftListProps = {
-	nfts: Nft[];
-};
-export const NFTList: FC<NftListProps> = ({nfts}) => {
+type NftListProps = {};
+export const NFTList: FC<NftListProps> = () => {
+	const {
+		nfts: {data, buyNft},
+	} = useListedNfts();
+	console.log('📢[index.tsx:9]: ', data);
 	return (
 		<div className='grid max-w-lg gap-5 mx-auto mt-12 lg:grid-cols-3 lg:max-w-none'>
-			{nfts.map(nft => {
+			{data?.map((nft: Nft) => {
 				return (
 					<div
 						key={nft.meta.image}
 						className='flex flex-col overflow-hidden rounded-lg shadow-lg'>
-						<NFTItem item={nft} />
+						<NFTItem item={nft} buyNft={buyNft} />
 					</div>
 				);
 			})}

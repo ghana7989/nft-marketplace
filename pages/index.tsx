@@ -1,9 +1,6 @@
-import {useListedNfts} from '@hooks';
 import type {NextPage} from 'next';
 import {BaseLayout, NFTList} from '../components';
-// import nfts from '../content/meta.json';
 const Home: NextPage = () => {
-	const {nfts} = useListedNfts();
 	return (
 		<BaseLayout>
 			<div className='relative px-4 pt-16 pb-20 bg-gray-50 sm:px-6 lg:pt-24 lg:pb-28 lg:px-8'>
@@ -16,7 +13,7 @@ const Home: NextPage = () => {
 							Mint a NFT to get unlimited ownership forever!
 						</p>
 					</div>
-					<NFTList nfts={nfts?.data} />
+					<NFTList />
 				</div>
 			</div>
 		</BaseLayout>

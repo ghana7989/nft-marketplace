@@ -1,4 +1,3 @@
-import {setupHooks} from '@hooks/web3/setupHooks';
 import {MetaMaskInpageProvider} from '@metamask/providers';
 import {NftMarketContract} from '@_types/nftMarketContract';
 import {ethers} from 'ethers';
@@ -18,9 +17,9 @@ interface IWeb3ProviderProps {
 
 const pageReload = () => window.location.reload();
 const handleAccount = (ethereum: MetaMaskInpageProvider) => async () => {
+	pageReload();
 	const isLocked = !(await ethereum._metamask.isUnlocked());
 	if (isLocked) {
-		pageReload();
 	}
 };
 const setGlobalListeners = (ethereum: MetaMaskInpageProvider) => {
@@ -40,7 +39,7 @@ export const Web3Provider: FC<IWeb3ProviderProps> = ({children}) => {
 				const {ethereum} = window;
 				const provider = new ethers.providers.Web3Provider(ethereum as any);
 				const contract = await loadContract('NftMarket', provider);
-				const signer = provider.getSigner();
+				const signer = provider.getSigner(); // this is for provider to know which account to use for transactions
 				const signedContract = contract.connect(signer);
 				setGlobalListeners(ethereum);
 				if (ethereum) {

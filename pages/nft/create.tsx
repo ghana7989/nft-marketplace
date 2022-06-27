@@ -1,12 +1,79 @@
+import {NftMeta} from '@_types/NFT';
+import axios from 'axios';
 import {NextPage} from 'next';
 import Link from 'next/link';
-import {useState} from 'react';
-import {BaseLayout} from '../../components';
-const ATTRIBUTES = ['health', 'attack', 'speed'];
+import {ChangeEvent, useCallback, useState} from 'react';
+import {BaseLayout, useWeb3} from '../../components';
 
 const NFTCreate: NextPage = ({}) => {
+	const {ethereum} = useWeb3();
 	const [nftURI, setNftURI] = useState('');
 	const [hasURI, setHasURI] = useState(false);
+	const [nftMeta, setNftMeta] = useState<NftMeta>({
+		attributes: [
+			{
+				trait_type: 'attack',
+				value: '0',
+			},
+			{
+				trait_type: 'health',
+				value: '0',
+			},
+			{
+				trait_type: 'speed',
+				value: '0',
+			},
+		],
+		description: '',
+		image: '',
+		name: '',
+	});
+
+	const handleChange = useCallback(
+		(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+			const {name, value} = e.target;
+			setNftMeta({...nftMeta, [name]: value});
+		},
+		[nftMeta],
+	);
+	const handleAttributeChange = useCallback(
+		(attribute: {trait_type: string}) => (e: ChangeEvent<HTMLInputElement>) => {
+			setNftMeta(p => ({
+				...p,
+				attributes: p.attributes.map(attr => {
+					if (attr.trait_type === attribute.trait_type) {
+						return {
+							...attr,
+							value: e.target.value,
+						};
+					}
+					return attr;
+				}),
+			}));
+		},
+		[nftMeta],
+	);
+	const createNFT = async () => {
+		try {
+			const messageToSign = await axios.get('/api/verify');
+			const [account, ...r] = await ethereum.request({
+				method: 'eth_requestAccounts',
+			});
+			const signedData = await ethereum.request({
+				method: 'personal_sign',
+				params: [
+					JSON.stringify(messageToSign.data),
+					account,
+					messageToSign.data.nonce,
+				],
+			});
+			await axios.post('/api/verify', {
+				address: account,
+				signature: signedData,
+				nft: nftMeta,
+			});
+		} catch (error) {}
+	};
 	return (
 		<BaseLayout>
 			<div>
@@ -126,6 +193,8 @@ const NFTCreate: NextPage = ({}) => {
 											</label>
 											<div className='flex mt-1 rounded-md shadow-sm'>
 												<input
+													onChange={handleChange}
+													value={nftMeta.name}
 													type='text'
 													name='name'
 													id='name'
@@ -142,12 +211,13 @@ const NFTCreate: NextPage = ({}) => {
 											</label>
 											<div className='mt-1'>
 												<textarea
+													onChange={handleChange}
+													value={nftMeta.description}
 													id='description'
 													name='description'
 													rows={3}
 													className='w-full p-3 bg-white border border-gray-300 rounded-md shadow-sm'
 													placeholder='Some nft description...'
-													defaultValue={''}
 												/>
 											</div>
 											<p className='mt-2 text-sm text-gray-500'>
@@ -164,7 +234,7 @@ const NFTCreate: NextPage = ({}) => {
 										) : (
 											<div>
 												<label className='block text-sm font-medium text-gray-700'>
-													Cover photo
+													Image
 												</label>
 												<div className='flex justify-center px-6 pt-5 pb-6 mt-1 border-2 border-gray-300 border-dashed rounded-md'>
 													<div className='space-y-1 text-center'>
@@ -203,19 +273,21 @@ const NFTCreate: NextPage = ({}) => {
 											</div>
 										)}
 										<div className='grid grid-cols-6 gap-6'>
-											{ATTRIBUTES.map(attribute => (
+											{nftMeta.attributes.map(attribute => (
 												<div
-													key={attribute}
+													key={attribute.trait_type}
 													className='col-span-6 sm:col-span-6 lg:col-span-2'>
 													<label
-														htmlFor={attribute}
+														htmlFor={attribute.trait_type}
 														className='block text-sm font-medium text-gray-700'>
-														{attribute}
+														{attribute.trait_type}
 													</label>
 													<input
+														onChange={handleAttributeChange(attribute)}
+														value={attribute.value}
 														type='text'
-														name={attribute}
-														id={attribute}
+														name={attribute.trait_type}
+														id={attribute.trait_type}
 														className='w-full max-w-xs bg-white input input-bordered'
 													/>
 												</div>
@@ -226,8 +298,11 @@ const NFTCreate: NextPage = ({}) => {
 										</p>
 									</div>
 									<div className='px-4 py-3 text-right bg-gray-50 sm:px-6'>
-										<button type='button' className='btn btn-primary'>
-											Save
+										<button
+											onClick={createNFT}
+											type='button'
+											className='btn btn-primary'>
+											List NFT
 										</button>
 									</div>
 								</div>

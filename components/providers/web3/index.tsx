@@ -41,7 +41,9 @@ export const Web3Provider: FC<IWeb3ProviderProps> = ({children}) => {
 				const contract = await loadContract('NftMarket', provider);
 				const signer = provider.getSigner(); // this is for provider to know which account to use for transactions
 				const signedContract = contract.connect(signer);
-				setGlobalListeners(ethereum);
+				setTimeout(() => {
+					setGlobalListeners(ethereum);
+				}, 400);
 				if (ethereum) {
 					setWeb3Api(
 						createWeb3State({

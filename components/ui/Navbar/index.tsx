@@ -9,7 +9,8 @@ export function Navbar() {
 	const {network} = useNetwork();
 
 	return (
-		<div className='self-center navbar bg-base-100 max-w-7xl'>
+    <div className='self-center navbar bg-base-100 max-w-7xl'>
+      <title>Daisy NFT Marketplace</title>
 			<div className='navbar-start'>
 				<div className='dropdown'>
 					<label tabIndex={0} className='btn btn-ghost lg:hidden'>

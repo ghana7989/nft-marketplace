@@ -161,7 +161,7 @@ const Profile: NextPage = ({}) => {
 											}}
 											disabled={activeNft.isListed}
 											type='button'
-											className='flex-1 px-4 py-2 ml-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm cursor-not-allowed disabled:text-gray-400 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'>
+											className='flex-1 px-4 py-2 ml-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm disabled:cursor-not-allowed disabled:text-gray-400 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'>
 											{activeNft.isListed ? 'NFT Is Listed' : 'List Nft'}
 										</button>
 									</div>

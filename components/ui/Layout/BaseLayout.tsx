@@ -7,6 +7,9 @@ interface Props {
 const BaseLayout: FC<Props> = ({children}) => {
 	return (
 		<>
+			<header>
+				<title>Daisy NFT Marketplace</title>
+			</header>
 			<Navbar />
 			<div className='min-h-screen py-16 overflow-hidden bg-gray-50'>
 				<div className='px-4 mx-auto space-y-8 max-w-7xl sm:px-6 lg:px-8'>

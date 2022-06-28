@@ -102,9 +102,7 @@ const NFTCreate: NextPage = ({}) => {
 				...nftMeta,
 				image: `${process.env.NEXT_PUBLIC_PINATA_DOMAIN}/ipfs/${data.IpfsHash}`,
 			});
-		} catch (error) {
-			console.log('📢[create.tsx:78]: ', error);
-		}
+		} catch (error) {}
 	};
 
 	const uploadMetaData = async () => {

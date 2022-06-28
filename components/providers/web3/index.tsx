@@ -34,17 +34,18 @@ export const Web3Provider: FC<IWeb3ProviderProps> = ({children}) => {
 	const [web3Api, setWeb3Api] = useState<Web3State>(createDefaultState());
 
 	useEffect(() => {
-		async function initWeb3() {
+		(async function () {
 			try {
 				const {ethereum} = window;
+
 				const provider = new ethers.providers.Web3Provider(ethereum as any);
+
 				const contract = await loadContract('NftMarket', provider);
+
 				const signer = provider.getSigner(); // this is for provider to know which account to use for transactions
 				const signedContract = contract.connect(signer);
-				setTimeout(() => {
-					setGlobalListeners(ethereum);
-				}, 400);
 				if (ethereum) {
+					setGlobalListeners(ethereum);
 					setWeb3Api(
 						createWeb3State({
 							isLoading: false,
@@ -64,8 +65,10 @@ export const Web3Provider: FC<IWeb3ProviderProps> = ({children}) => {
 					};
 				});
 			}
-		}
-		initWeb3();
+		})();
+
+		// async function initWeb3() {}
+		// initWeb3();
 		return () => {
 			removeGlobalListeners(window.ethereum);
 		};

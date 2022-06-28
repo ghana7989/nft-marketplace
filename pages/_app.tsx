@@ -8,6 +8,7 @@ function MyApp({Component, pageProps}: AppProps) {
 		<div className='flex flex-col'>
 			<Web3Provider>
 				<ToastContainer />
+				{/* @ts-ignore  */}
 				<Component {...pageProps} />
 			</Web3Provider>
 		</div>

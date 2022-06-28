@@ -2306,27 +2306,21 @@
     "version": "0.8.15+commit.e14f2714.Emscripten.clang"
   },
   "networks": {
+    "3": {
+      "events": {},
+      "links": {},
+      "address": "0xdfD74Eb1B96Cca78f6952b84DAEf3510cEec97BD",
+      "transactionHash": "0x4cb0d592a675be8890a9c99ff37cfa52a6496c193871cab54896b82e297278e8"
+    },
     "5777": {
       "events": {},
       "links": {},
-      "address": "0x7b6402aA7819AE958653d2e62E66393FeDD99659",
-      "transactionHash": "0x16967bb73a10e7c1b428554848b8c847cf01e9ed99133dc2b85864c0dbc02b66"
-    },
-    "1656211659283": {
-      "events": {},
-      "links": {},
-      "address": "0xB7A03590CF66AeD3aA22E4Fed671648f0AbDc0CA",
-      "transactionHash": "0x9dd96ce26ef96ae1a4b1bf73578ce648043b75b25314091ce486976b08377e88"
-    },
-    "1656215734439": {
-      "events": {},
-      "links": {},
-      "address": "0x0a0de0CA964d1987dC19305D3aFDDF74fa59de50",
-      "transactionHash": "0x7dad146e0e6ed8426fb646fac1b38b07dbf296d6cdcb46681712817d8ddcbcbf"
+      "address": "0xE8d303b1a298268Bef7D6c7Bb576478Fb4ba5462",
+      "transactionHash": "0x8e46cacf66699db27b6329107b28cc70964a3a57b5caf699f3c785cf30d89cca"
     }
   },
   "schemaVersion": "3.4.3",
-  "updatedAt": "2022-06-27T04:36:44.473Z",
+  "updatedAt": "2022-06-28T16:30:11.811Z",
   "devdoc": {
     "kind": "dev",
     "methods": {},

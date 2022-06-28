@@ -1,6 +1,5 @@
 import {useAccount, useNetwork} from '@hooks';
 import Link from 'next/link';
-import {useState} from 'react';
 import {WalletBar} from './WalletBar';
 
 export function Navbar() {

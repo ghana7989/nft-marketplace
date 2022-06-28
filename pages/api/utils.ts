@@ -13,6 +13,7 @@ const abi = contract.abi;
 
 const NETWORKS = {
   '5777': 'Ganache',
+  "3":"Ropsten"
 };
 
 export const targetNetwork = process.env

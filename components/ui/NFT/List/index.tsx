@@ -8,7 +8,7 @@ export const NFTList: FC<NftListProps> = () => {
 	const {
 		nfts: {data, buyNft},
 	} = useListedNfts();
-	console.log('📢[index.tsx:9]: ', data);
+
 	return (
 		<div className='grid max-w-lg gap-5 mx-auto mt-12 lg:grid-cols-3 lg:max-w-none'>
 			{data?.map((nft: Nft) => {

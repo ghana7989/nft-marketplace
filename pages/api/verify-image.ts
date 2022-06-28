@@ -7,7 +7,11 @@ import axios from 'axios';
 import FormData from 'form-data';
 
 export default withSession(async (req: NextApiRequest & { session: Session; }, res: NextApiResponse) => {
+  
   if (req.method === "POST") {
+
+
+
     const { bytes, fileName, contentType } = req.body as FileRequest;
     if (!bytes || !fileName || !contentType) return res.status(400).json({ error: "Missing required fields" });
     await addressCheckMiddleware(req, res);
@@ -18,6 +22,9 @@ export default withSession(async (req: NextApiRequest & { session: Session; }, r
       filename: fileName + "-" + randomUUID(),
       contentType,
     });
+
+
+
     const fileResponse = await axios.post("https://api.pinata.cloud/pinning/pinFileToIPFS",
       formData, {
       maxBodyLength: Infinity,
@@ -28,7 +35,7 @@ export default withSession(async (req: NextApiRequest & { session: Session; }, r
       }
     },
     );
-    console.log("📢[verify-image.ts:18]: ", fileResponse);
+
     res.json(fileResponse.data);
   }
   else {
@@ -37,3 +44,9 @@ export default withSession(async (req: NextApiRequest & { session: Session; }, r
     });
   }
 });
+
+export const config = {
+  api: {
+    responseLimit: false,
+  },
+};

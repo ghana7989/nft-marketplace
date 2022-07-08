@@ -1,16 +1,51 @@
-import {FC} from 'react';
+import {XIcon} from '@heroicons/react/solid';
+import {FC, useEffect, useState} from 'react';
 import {Navbar} from '../Navbar';
 interface Props {
 	children: React.ReactNode;
 }
 
 const BaseLayout: FC<Props> = ({children}) => {
+	const [removeWarningBanner, setRemoveWarningBanner] = useState(false);
+	useEffect(() => {
+		const timerForRemovingBanner = setTimeout(() => {
+			setRemoveWarningBanner(true);
+		}, 5000);
+		return () => {
+			clearTimeout(timerForRemovingBanner);
+		};
+	});
 	return (
 		<>
 			<header>
 				<title>Daisy NFT Marketplace</title>
 			</header>
 			<Navbar />
+			{!removeWarningBanner && (
+				<div className='bg-warning'>
+					<div className='px-3 py-3 mx-auto max-w-7xl sm:px-6 lg:px-8'>
+						<div className='flex flex-wrap items-center justify-between'>
+							<div className='flex items-center flex-1 w-0'>
+								<p className='ml-3 font-medium text-white truncate'>
+									<span className='hidden md:inline'>
+										This project is using free tier of pinata, down times are
+										expected and NFTS might not load
+									</span>
+								</p>
+							</div>
+							<div className='flex-shrink-0 order-2 sm:order-3 sm:ml-3'>
+								<button
+									onClick={() => setRemoveWarningBanner(true)}
+									type='button'
+									className='flex p-2 -mr-1 rounded-md hover:bg-black focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2'>
+									<span className='sr-only'>Dismiss</span>
+									<XIcon className='w-6 h-6 text-white' aria-hidden='true' />
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			)}
 			<div className='min-h-screen py-16 overflow-hidden bg-gray-50'>
 				<div className='px-4 mx-auto space-y-8 max-w-7xl sm:px-6 lg:px-8'>
 					{children}
